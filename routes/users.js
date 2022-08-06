@@ -1,6 +1,9 @@
 const router = require("express").Router();
 const mysql = require("mysql");
+// const bodyParser = require("body-parser");
 require("dotenv").config();
+
+// router.use(bodyParser.urlencoded({ extended: true }));
 
 // MySql連携
 const connection = mysql.createConnection({
@@ -10,47 +13,24 @@ const connection = mysql.createConnection({
   database: process.env.MYSQLDATABASE,
 });
 
-// connection.connect(function (err: any) {
-//   if (err) throw err;
-//   console.log("Connected");
-// });
-
 // 全てのユーザー取得
-router.get("/", (request, response) => {
+router.get("/", (req, res) => {
   const sql = "select * from users";
   connection.query(sql, function (err, result) {
     if (err) throw err;
-    response.send(result);
+    res.send(result);
   });
 });
 
 // ユーザー登録
-router.post("/register", (req, res) => {
-  const name = req.body.name;
-  const email = req.body.email;
-  const ps = req.body.ps;
-  const profileimg = req.body.profileimg;
-  const isAdmin = req.body.isAdmin;
-  const likes = req.body.likes;
-
-  // const name = "user2";
-  // const email = "user2@gmail.com";
-  // const ps = "userPS2";
-  // const profileimg = "user2.jpeg";
-  // const isAdmin = false;
-  // const likes = null;
-
-  connection.query(
-    "INSERT INTO users (name, email, ps, profileimg, isAdmin, likes) VALUES (?,?,?,?,?,?)",
-    [name, email, ps, profileimg, isAdmin, likes],
-    (err, result) => {
-      if (err) {
-        console.log(err);
-      } else {
-        return res.send("Values Inserted");
-      }
-    }
-  );
+router.post("/create", (req, res) => {
+  const sql = "insert into users (name) values (?)";
+  connection.query(sql, [req.body.name], (err, result) => {
+    if (err) console.log(err);
+    const id = result.inserttId;
+    // return res.json(id);
+    return console.log(req.body);
+  });
 });
 
 module.exports = router;
